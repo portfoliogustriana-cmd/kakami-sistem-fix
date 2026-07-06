@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+html, body {
+  background-color: #f8fafc; /* slate-50 */
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* HIGH FIDELITY MEDIA PRINT STYLINGS */
+@page invoice-page {
+  size: 105mm 148mm; /* exactly A6 size */
+  margin: 0;
+}
+
+@page spk-page {
+  size: auto; /* standard default (A4, etc) */
+  margin: 5mm;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #printable-invoice-container {
+    page: invoice-page;
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 105mm !important;
+    height: 148mm !important;
+    max-width: 105mm !important;
+    max-height: 148mm !important;
+    box-sizing: border-box !important;
+    padding: 5mm 6mm !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+  }
+
+  #printable-invoice-container * {
+    visibility: visible;
+  }
+
+  #printable-spk-container {
+    page: spk-page;
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  #printable-spk-container * {
+    visibility: visible;
+  }
+  
+  /* Hide print dialogue controls */
+  .no-print,
+  nav,
+  button,
+  header,
+  footer {
+    display: none !important;
+  }
+
+  .no-print-overlay {
+    display: block !important;
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .no-print-overlay > div {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+  }
+}
+
+/* Ensure invoice and SPK print containers (and their children) on-screen look crisp and high-contrast in both light and dark mode */
+#printable-invoice-container,
+#printable-spk-container {
+  background-color: #ffffff !important;
+  color: #0f172a !important; /* slate-900 */
+}
+
+/* Ensure child elements in these containers do not fall back to light-colored dark mode text */
+#printable-invoice-container *,
+#printable-spk-container * {
+  color: #1e293b !important; /* high contrast dark slate-800 */
+  border-color: #0f172a !important;
+}
+
+/* Permit special highlighted elements to have their color background/text accents */
+#printable-invoice-container .text-rose-500,
+#printable-invoice-container .text-rose-600 {
+  color: #dc2626 !important;
+}
+#printable-invoice-container .text-emerald-600 {
+  color: #16a34a !important;
+}
+#printable-invoice-container .text-indigo-650 {
+  color: #4f46e5 !important;
+}
+#printable-spk-container .text-rose-650,
+#printable-spk-container .text-rose-600,
+#printable-spk-container .text-red-900 {
+  color: #b91c1c !important;
+}
+#printable-spk-container .text-blue-900,
+#printable-spk-container .text-blue-700 {
+  color: #1d4ed8 !important;
+}
+
+/* Retain specific backgrounds for highlighting status */
+#printable-invoice-container .bg-slate-900 {
+  background-color: #0f172a !important;
+}
+#printable-invoice-container .bg-slate-900 *,
+#printable-invoice-container .bg-slate-900 span {
+  color: #ffffff !important;
+}
+#printable-invoice-container .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+}
+#printable-spk-container .bg-slate-200 {
+  background-color: #e2e8f0 !important;
+}
+#printable-spk-container .bg-black {
+  background-color: #000000 !important;
+}
+#printable-spk-container .bg-black *,
+#printable-spk-container .bg-black th {
+  color: #ffffff !important;
+}
+#printable-spk-container .bg-red-500 {
+  background-color: #ef4444 !important;
+}
+#printable-spk-container .bg-red-500 *,
+#printable-spk-container .bg-red-500 td {
+  color: #ffffff !important;
+}
+#printable-spk-container .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+#printable-spk-container .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+}
+#printable-spk-container .bg-yellow-50 {
+  background-color: #fefce8 !important;
+}
+#printable-spk-container .bg-rose-50 {
+  background-color: #fef2f2 !important;
+}
+#printable-spk-container .bg-red-100 {
+  background-color: #fee2e2 !important;
+}
+#printable-spk-container .bg-amber-50 {
+  background-color: #fffbeb !important;
+}
+#printable-spk-container .bg-blue-50 {
+  background-color: #eff6ff !important;
+}
+
