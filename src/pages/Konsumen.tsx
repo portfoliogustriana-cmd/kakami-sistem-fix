@@ -25,8 +25,13 @@ const Konsumen = () => {
   const [selectedCust, setSelectedCust] = useState<CustomerSummary | null>(null);
 
   useEffect(() => {
-    const data = getStoredData();
+    const load = async () => {
+      
+    const data = await getStoredData();
     setOrders(data.orders);
+  
+    };
+    load();
   }, []);
 
   // Compute unique customer aggregates

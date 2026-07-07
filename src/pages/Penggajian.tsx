@@ -108,16 +108,21 @@ const Penggajian = () => {
     return `${getIndonesianMonthName(month)} ${year}`;
   };
   useEffect(() => {
-    const data = getStoredData();
+    const load = async () => {
+      
+    const data = await getStoredData();
     setOrders(data.orders);
     setTransactions(data.transactions);
     setOrderItems(data.orderItems);
     setPayrolls(data.payroll || []);
     setHutangs(data.hutang || []);
+  
+    };
+    load();
   }, []);
-  const syncData = (newPayrolls: Payroll[]) => {
+  const syncData = async (newPayrolls: Payroll[]) => {
     setPayrolls(newPayrolls);
-    saveStoredData(orders, orderItems, transactions, newPayrolls, hutangs);
+    await saveStoredData(orders, orderItems, transactions, newPayrolls, hutangs);
   };
   /* Time conversion & calculation utilities */
   const calculateTimes = (
@@ -340,7 +345,7 @@ const Penggajian = () => {
       const totalPotongan = totalJamTelat * importPotonganPerJam;
       const totalGaji = Math.max(0, gajiPokok + totalUangMakan - totalPotongan);
       const newSlip: Payroll = {
-        id: Date.now() + Math.floor(Math.random() * 100000),
+        id: Math.floor(Date.now() / 1000) + Math.floor(Math.random() * 100000),
         tipe: "Karyawan",
         nama_pegawai: worker.name,
         peran: worker.peran,
@@ -483,7 +488,7 @@ const Penggajian = () => {
       syncData(updated);
     } else {
       const newPayroll: Payroll = {
-        id: Date.now(),
+        id: Math.floor(Date.now() / 1000),
         tipe: payrollForm.tipe || "Borongan",
         nama_pegawai: payrollForm.nama_pegawai,
         peran: payrollForm.peran || "Lainnya",
@@ -505,7 +510,7 @@ const Penggajian = () => {
     }
     setIsPayrollModalOpen(false);
   };
-  const handleDeletePayroll = (id: number) => {
+  const handleDeletePayroll = async (id: number) => {
     if (window.confirm("Apakah Anda yakin ingin menghapus slip upah ini?")) {
       const updated = payrolls.filter((p) => p.id !== id);
       syncData(updated);

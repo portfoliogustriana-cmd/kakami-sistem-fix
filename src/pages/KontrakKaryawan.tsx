@@ -18,7 +18,9 @@ export default function Kontrak() {
   const [keterangan, setKeterangan] = useState('');
 
   useEffect(() => {
-    const data = getStoredData();
+    const load = async () => {
+        const data = await getStoredData();
+        
     const updateStatus = (k: KontrakKaryawan): KontrakKaryawan => {
       const today = new Date();
       const endDate = new Date(k?.tanggal_selesai || new Date());
@@ -38,9 +40,12 @@ export default function Kontrak() {
     setKontraks(updatedKontraks);
 
     if (data.kontrak) {
-      saveStoredData(data.orders, data.orderItems, data.transactions, data.payroll, data.hutang, updatedKontraks);
+      await saveStoredData(data.orders, data.orderItems, data.transactions, data.payroll, data.hutang, updatedKontraks);
     }
-  }, []);
+  
+    };
+    load();
+}, []);
 
   const resetForm = () => {
     setEditingId(null);
@@ -53,7 +58,7 @@ export default function Kontrak() {
     setIsModalOpen(false);
   };
 
-  const handleEdit = (k: KontrakKaryawan) => {
+  const handleEdit = async (k: KontrakKaryawan) => {
     setEditingId(k.id);
     setNamaKaryawan(k.nama_karyawan);
     setPosisi(k.posisi);
@@ -64,16 +69,16 @@ export default function Kontrak() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Yakin ingin menghapus data kontrak ini?')) {
       const newData = kontraks.filter(k => k.id !== id);
       setKontraks(newData);
-      const data = getStoredData();
-      saveStoredData(data.orders, data.orderItems, data.transactions, data.payroll, data.hutang, newData);
+      const data = await getStoredData();
+      await saveStoredData(data.orders, data.orderItems, data.transactions, data.payroll, data.hutang, newData);
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!namaKaryawan || !posisi || !tanggalMulai || !tanggalSelesai) {
       alert('Mohon lengkapi data wajib.');
@@ -93,7 +98,7 @@ export default function Kontrak() {
     }
 
     const newKontrak: KontrakKaryawan = {
-      id: editingId || Date.now(),
+      id: editingId || Math.floor(Date.now() / 1000),
       nama_karyawan: namaKaryawan,
       posisi,
       tanggal_mulai: tanggalMulai,
@@ -111,8 +116,8 @@ export default function Kontrak() {
     }
 
     setKontraks(newData);
-    const data = getStoredData();
-    saveStoredData(data.orders, data.orderItems, data.transactions, data.payroll, data.hutang, newData);
+    const data = await getStoredData();
+    await saveStoredData(data.orders, data.orderItems, data.transactions, data.payroll, data.hutang, newData);
     resetForm();
   };
 

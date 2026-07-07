@@ -286,7 +286,7 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = async (event: MouseEvent) => {
       if (
         suggestionsRef.current &&
         !suggestionsRef.current.contains(event.target as Node)
@@ -298,7 +298,9 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   useEffect(() => {
-    const data = getStoredData();
+    const load = async () => {
+      
+    const data = await getStoredData();
     setOrders(data.orders);
     setTransactions(data.transactions);
     setOrderItems(data.orderItems);
@@ -312,8 +314,11 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
     setSuggestedCustomers(
       Object.entries(custs).map(([nama, telepon]) => ({ nama, telepon })),
     );
+  
+    };
+    load();
   }, []);
-  const syncData = (
+  const syncData = async (
     newOrders: Order[],
     newTx = transactions,
     newItems = orderItems,
@@ -321,7 +326,7 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
     setOrders(newOrders);
     setTransactions(newTx);
     setOrderItems(newItems);
-    saveStoredData(newOrders, newItems, newTx);
+    await saveStoredData(newOrders, newItems, newTx);
   };
   /* Autocalculate totals */
   const currentHargaSatuan = parseFloat(hargaSatuan) || 0;
@@ -371,7 +376,7 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
       setEditingId(null);
     } else {
       /* Add new order */
-      const newId = Date.now();
+      const newId = Math.floor(Date.now() / 1000);
       const invoice = `INV/${new Date().toISOString().replace(/T/, "").replace(/[-:]/g, "").substring(0, 8)}${Math.floor(100 + Math.random() * 900)}`;
       const newOrder: Order = {
         id: newId,
@@ -396,7 +401,7 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
       let updatedTx = [...transactions];
       if (dpVal > 0) {
         const newTx: Transaction = {
-          id: Date.now(),
+          id: Math.floor(Date.now() / 1000),
           jenis: "Pemasukan",
           kategori: "DP Order",
           nominal: dpVal,
@@ -474,7 +479,7 @@ Nego/Diskon: -Rp ${nego.toLocaleString("id-ID")}
     });
     /* Write cash transaction of installment path */
     const newTx: Transaction = {
-      id: Date.now(),
+      id: Math.floor(Date.now() / 1000),
       jenis: "Pemasukan",
       kategori: "Cicilan",
       nominal: bayarValid,

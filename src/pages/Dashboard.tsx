@@ -25,10 +25,15 @@ const Dashboard = () => {
     setStoredMonth(val);
   };
   useEffect(() => {
-    const data = getStoredData();
+    const load = async () => {
+      
+    const data = await getStoredData();
     setOrders(data.orders);
     setTransactions(data.transactions);
     setOrderItems(data.orderItems);
+  
+    };
+    load();
   }, []); /* Filtered lists based on month */
 const filteredOrders = orders.filter((o) => o.tanggal_order.startsWith(bulan)); const filteredTransactions = transactions.filter((t) => t.tanggal.startsWith(bulan)); /* --- Calculations --- */
 /* 1. Finance Metrics */

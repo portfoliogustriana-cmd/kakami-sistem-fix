@@ -11,15 +11,17 @@ const ManajemenUser = () => {
     password: "",
   });
   useEffect(() => {
-    setUsers(getStoredUsers());
+    
+    getStoredUsers().then(u => setUsers(u));
+  
   }, []);
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     if (!newUser.username || !newUser.password)
       return alert("Username dan Password wajib diisi");
-    const userToSave: User = { id: Date.now(), ...newUser };
+    const userToSave: User = { id: Math.floor(Date.now() / 1000), ...newUser };
     const updated = [...users, userToSave];
     setUsers(updated);
-    saveStoredUsers(updated);
+    await await saveStoredUsers(updated);
     setNewUser({
       username: "",
       nama_lengkap: "",
@@ -28,11 +30,11 @@ const ManajemenUser = () => {
       password: "",
     });
   };
-  const handleDeleteUser = (id: number) => {
+  const handleDeleteUser = async (id: number) => {
     if (users.length <= 1) return alert("Minimal harus ada 1 pengguna");
     const updated = users.filter((u) => u.id !== id);
     setUsers(updated);
-    saveStoredUsers(updated);
+    await await saveStoredUsers(updated);
   };
   return (
     <div className="p-4 sm:p-8 w-full max-w-4xl mx-auto">
@@ -76,7 +78,9 @@ const ManajemenUser = () => {
                 },
               ]),
             );
-            setUsers(getStoredUsers());
+            
+    getStoredUsers().then(u => setUsers(u));
+  
             alert("Users telah direset ke default!");
           }}
           className="bg-black text-white p-2 rounded font-bold flex items-center justify-center gap-2"

@@ -15,7 +15,7 @@ const GantiPassword = () => {
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!currentUser) return;
     if (currentUser.password !== oldPassword) {
       setError("Password lama salah.");
@@ -25,11 +25,11 @@ const GantiPassword = () => {
       setError("PIN keamanan salah.");
       return;
     }
-    const users = getStoredUsers();
+    const users = await getStoredUsers();
     const updatedUsers = users.map((u) =>
       u.id === currentUser.id ? { ...u, password: newPassword } : u,
     );
-    saveStoredUsers(updatedUsers);
+    await await saveStoredUsers(updatedUsers);
     const updatedUser = updatedUsers.find((u) => u.id === currentUser.id)!;
     setCurrentUser(updatedUser);
     setSuccess("Password berhasil diperbarui!");

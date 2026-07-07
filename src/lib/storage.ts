@@ -309,14 +309,26 @@ export const setStoredMonth = (month: string) => {
 };
 
 // LocalStorage helpers with fallback to mock data
-export const getStoredData = () => {
+export const getStoredData = async () => {
+  try {
+    const response = await fetch('/api/data');
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+  } catch (e) {
+    console.error('Failed to fetch data from API', e);
+  }
+  
+  // Fallback to localStorage
   const o = localStorage.getItem("kakami_orders");
   const i = localStorage.getItem("kakami_order_items");
   const t = localStorage.getItem("kakami_transactions");
   const p = localStorage.getItem("kakami_payroll");
   const h = localStorage.getItem("kakami_hutang");
   const k = localStorage.getItem("kakami_kontrak");
-  const safeParse = (str: string | null, fallback: any) => {
+
+  const safeParse = (str, fallback) => {
     if (!str) return fallback;
     try {
       return JSON.parse(str);
@@ -324,19 +336,14 @@ export const getStoredData = () => {
       return fallback;
     }
   };
-  const orders: Order[] = safeParse(o, DEFAULT_ORDERS);
-  const orderItems: OrderItem[] = safeParse(i, DEFAULT_ORDER_ITEMS);
-  const transactions: Transaction[] = safeParse(t, DEFAULT_TRANSACTIONS);
-  const payroll: Payroll[] = safeParse(p, DEFAULT_PAYROLL);
-  const hutang: Hutang[] = safeParse(h, DEFAULT_HUTANG);
-  const kontrak: KontrakKaryawan[] = safeParse(k, DEFAULT_KONTRAK);
-  // Sync back if not present
-  if (!o) localStorage.setItem('kakami_orders', JSON.stringify(DEFAULT_ORDERS));
-  if (!i) localStorage.setItem('kakami_order_items', JSON.stringify(DEFAULT_ORDER_ITEMS));
-  if (!t) localStorage.setItem('kakami_transactions', JSON.stringify(DEFAULT_TRANSACTIONS));
-  if (!p) localStorage.setItem('kakami_payroll', JSON.stringify(DEFAULT_PAYROLL));
-  if (!h) localStorage.setItem('kakami_hutang', JSON.stringify(DEFAULT_HUTANG));
-  if (!k) localStorage.setItem('kakami_kontrak', JSON.stringify(DEFAULT_KONTRAK));
+
+  const orders = safeParse(o, DEFAULT_ORDERS);
+  const orderItems = safeParse(i, DEFAULT_ORDER_ITEMS);
+  const transactions = safeParse(t, DEFAULT_TRANSACTIONS);
+  const payroll = safeParse(p, DEFAULT_PAYROLL);
+  const hutang = safeParse(h, DEFAULT_HUTANG);
+  const kontrak = safeParse(k, DEFAULT_KONTRAK);
+
   return { orders, orderItems, transactions, payroll, hutang, kontrak };
 };
 export const saveStoredData = (
@@ -354,7 +361,17 @@ export const saveStoredData = (
   if (hutang) localStorage.setItem("kakami_hutang", JSON.stringify(hutang));
   if (kontrak) localStorage.setItem("kakami_kontrak", JSON.stringify(kontrak));
 };
-export const getStoredUsers = (): User[] => {
+export const getStoredUsers = async (): Promise<User[]> => {
+  try {
+    const response = await fetch('/api/users');
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.length > 0) return data;
+    }
+  } catch (e) {
+    console.error('Failed to fetch users from API', e);
+  }
+  
   const u = localStorage.getItem("kakami_users");
   let users: User[] = [];
   if (u) {
@@ -367,25 +384,32 @@ export const getStoredUsers = (): User[] => {
   } else {
     users = DEFAULT_USERS;
   }
-  // Ensure Owner exists
   if (!users.find(u => u.role === 'Owner')) {
     const owner = DEFAULT_USERS.find(u => u.role === 'Owner');
     if (owner) users.push(owner);
   }
-  localStorage.setItem('kakami_users', JSON.stringify(users));
   return users;
 };
-export const saveStoredUsers = (users: User[]) => {
+export const saveStoredUsers = async (users: User[]) => {
   localStorage.setItem("kakami_users", JSON.stringify(users));
+  try {
+    await fetch('/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(users)
+    });
+  } catch (e) {
+    console.error('Failed to sync users to API', e);
+  }
 };
 export const getCurrentUser = (): User | null => {
-  const u = localStorage.getItem("kakami_current_user");
+  const u = sessionStorage.getItem("kakami_current_user");
   return u ? JSON.parse(u) : null;
 };
 export const setCurrentUser = (user: User | null) => {
   if (user) {
-    localStorage.setItem("kakami_current_user", JSON.stringify(user));
+    sessionStorage.setItem("kakami_current_user", JSON.stringify(user));
   } else {
-    localStorage.removeItem("kakami_current_user");
+    sessionStorage.removeItem("kakami_current_user");
   }
 };

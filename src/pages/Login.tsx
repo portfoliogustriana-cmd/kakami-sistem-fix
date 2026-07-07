@@ -7,9 +7,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const users = getStoredUsers();
+    const users = await getStoredUsers();
     const user = users.find(
       (u) =>
         u.username.toLowerCase() === username.trim().toLowerCase() &&
